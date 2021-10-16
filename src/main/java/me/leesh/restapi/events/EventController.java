@@ -2,6 +2,7 @@ package me.leesh.restapi.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +59,7 @@ public class EventController {
                 , selfLinkBuilder.slash(event.getId()).withSelfRel()
                 , selfLinkBuilder.withRel("query-events")
                 , selfLinkBuilder.withRel("update-event")
+                , new Link("/docs/index.html#resources-events-create").withRel("profile")
         );
 
         return ResponseEntity.created(uri).body(eventEntityModel);
