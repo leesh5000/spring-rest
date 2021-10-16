@@ -8,6 +8,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EventTest {
 
+    /**
+     * 빌더의 장점
+     * 1. 어떤 값을 넣어야하는지 알 수 있다.
+     * 2. 어떤 값이 들어가는지 알 수 있다.
+     */
     @Test
     @DisplayName("빌더가 있는지 확인")
     public void builder() {

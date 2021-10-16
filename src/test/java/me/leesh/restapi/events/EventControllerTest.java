@@ -111,4 +111,27 @@ class EventControllerTest {
                         .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("잘못된 입력값이 들어온 경우")
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("REST API")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 26, 14, 21))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 11, 24, 14, 21))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 25, 14, 21))
+                .endEventDateTime(LocalDateTime.of(2018, 11, 24, 14, 21))
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남 D2 Smart Factory")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
 }
