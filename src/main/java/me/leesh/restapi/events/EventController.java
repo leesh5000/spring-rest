@@ -35,13 +35,13 @@ public class EventController {
 
         // JSR303으로 바인딩 시 에러 확인
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         // JSR303 검증을 통과하면, 이제 인풋 값의 데이터 유효성 검증
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         Event event = modelMapper.map(eventDto, Event.class);

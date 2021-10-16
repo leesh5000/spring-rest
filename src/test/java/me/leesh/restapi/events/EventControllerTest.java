@@ -113,7 +113,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("잘못된 입력값이 들어온 경우")
+    @DisplayName("잘못된 입력값이 들어온 경우 - 400에러")
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
 
         EventDto eventDto = EventDto.builder()
@@ -132,6 +132,11 @@ class EventControllerTest {
         this.mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(eventDto)))
-                .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+        ;
     }
 }
