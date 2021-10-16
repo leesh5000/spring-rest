@@ -2,6 +2,7 @@ package me.leesh.restapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,6 +34,7 @@ class EventControllerTest {
 //    EventRepository eventRepository;
 
     @Test
+    @DisplayName("올바른 입력 값이 들어온 경우 - 201 응답")
     public void createEvent() throws Exception {
 
         EventDto event = EventDto.builder()
@@ -66,6 +68,7 @@ class EventControllerTest {
     }
 
     @Test
+    @DisplayName("입력 값 이외의 값들이 들어온 경우 - 400 에러")
     public void createEvent_BadRequest() throws Exception {
 
         /**
@@ -96,6 +99,16 @@ class EventControllerTest {
                         .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
 
+    @Test
+    @DisplayName("빈 입력값이 들어온 경우")
+    public void createEvent_Bad_Request_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
     }
 }
