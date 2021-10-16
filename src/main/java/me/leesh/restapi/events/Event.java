@@ -1,6 +1,7 @@
 package me.leesh.restapi.events;
 
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Event {
+public class Event extends RepresentationModel<Event> {
 
     @Id @GeneratedValue
     private Integer id;
@@ -31,4 +32,9 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
 
+    public void update() {
+
+        this.free = (this.basePrice == 0 && this.maxPrice == 0);
+        this.offline = (this.location != null && !this.location.isBlank());
+    }
 }
