@@ -1,22 +1,13 @@
 package me.leesh.restapi.events;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import me.leesh.restapi.common.RestDocsConfiguration;
+import me.leesh.restapi.common.BaseControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.ui.ModelMap;
 
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
@@ -31,25 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-//@WebMvcTest // Slice 테스트이므로, Web 용 Bean들만 등록해줌
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Import(RestDocsConfiguration.class)
-@ActiveProfiles("test") // base properties + "test" properties
-@SpringBootTest // 전체 Bean이 등록된 테스트
-class EventControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
+class EventControllerTest extends BaseControllerTest {
 
     @Autowired
     EventRepository eventRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
 
 //    @MockBean // Mock객체이므로, save, update를 하더라도 리턴되는 값이 모두 null이다.
 //    EventRepository eventRepository;
