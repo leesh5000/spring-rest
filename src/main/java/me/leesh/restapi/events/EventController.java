@@ -80,14 +80,37 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity getEvent(@PathVariable Integer id) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
-        if (optionalEvent.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
 
-        Event event = optionalEvent.get();
-        EntityModel<Event> eventResource = EventResource.modelOf(event);
-        eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
-        return ResponseEntity.ok(eventResource);
+//        if (optionalEvent.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        Event event = optionalEvent.get();
+//        EntityModel<Event> eventResource = EventResource.modelOf(event);
+//        eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+//
+//        return ResponseEntity.ok(eventResource);
+
+//        return optionalEvent.ifPresentOrElse(
+//                event -> {
+//                    EntityModel<Event> eventResource = EventResource.modelOf(event);
+//                    eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+//                    return ResponseEntity.ok(eventResource);
+//                },
+//                () -> {
+//                    return ResponseEntity.notFound().build();
+//                }
+//        );
+
+        return optionalEvent
+                .map(event -> {
+                    EntityModel<Event> eventResource = EventResource.modelOf(event);
+                    eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+                    return ResponseEntity.ok(eventResource);
+                })
+                .orElseGet(() -> {
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     @PutMapping("/{id}")

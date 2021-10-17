@@ -1,6 +1,7 @@
 package me.leesh.restapi.events;
 
 import lombok.*;
+import me.leesh.restapi.accounts.Account;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -31,6 +32,8 @@ public class Event extends RepresentationModel<Event> {
     private boolean free;
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
+    @ManyToOne
+    private Account manager;
 
     public void update() {
 
