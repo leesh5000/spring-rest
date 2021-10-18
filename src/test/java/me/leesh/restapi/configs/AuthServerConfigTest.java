@@ -3,6 +3,7 @@ package me.leesh.restapi.configs;
 import me.leesh.restapi.accounts.Account;
 import me.leesh.restapi.accounts.AccountRole;
 import me.leesh.restapi.accounts.AccountService;
+import me.leesh.restapi.common.AppProperties;
 import me.leesh.restapi.common.BaseControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ class AuthServerConfigTest extends BaseControllerTest {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    AppProperties appProperties;
+
     /**
      * 본 프로젝트에서는 스프링 시큐리티가 지원하는 6가지 Grant Type 중 Password, Refresh Token 2가지 방법을 지원한다.
      * 최초에는 Password Grant Type 으로 발급을 받는다.
@@ -33,21 +37,19 @@ class AuthServerConfigTest extends BaseControllerTest {
     public void getAuthToken() throws Exception {
 
         // given
-        String username = "lsh";
-        String password = "lsh";
-        Account user = Account.builder()
-                .email(username)
-                .password(password)
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-
-        String clientId = "myApp";
-        String clientSecret = "pass";
+//        Account user = Account.builder()
+//                .email(appProperties.getUserUsername())
+//                .password(appProperties.getUserPassword())
+//                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+//                .build();
+//
+//        String clientId = "myApp";
+//        String clientSecret = "pass";
 
         this.mockMvc.perform(post("/oauth/token")
-                        .with(httpBasic(clientId, clientSecret))
-                        .param("username", username)
-                        .param("password", password)
+                        .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                        .param("username", appProperties.getUserUsername())
+                        .param("password", appProperties.getUserPassword())
                         .param("grant_type", "password"))
                 .andDo(print())
                 .andExpect(status().isOk())

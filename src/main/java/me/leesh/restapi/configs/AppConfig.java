@@ -1,8 +1,10 @@
 package me.leesh.restapi.configs;
 
 import me.leesh.restapi.accounts.Account;
+import me.leesh.restapi.accounts.AccountRepository;
 import me.leesh.restapi.accounts.AccountRole;
 import me.leesh.restapi.accounts.AccountService;
+import me.leesh.restapi.common.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -34,12 +36,21 @@ public class AppConfig {
             @Autowired
             AccountService accountService;
 
+            @Autowired
+            AppProperties appProperties;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
 
                 Account user = Account.builder()
-                        .email("lsh")
-                        .password("lsh")
+                        .email(appProperties.getUserUsername())
+                        .password(appProperties.getUserPassword())
+                        .roles(Set.of(AccountRole.USER))
+                        .build();
+
+                Account admin = Account.builder()
+                        .email(appProperties.getAdminUsername())
+                        .password(appProperties.getAdminPassword())
                         .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                         .build();
 

@@ -1,10 +1,10 @@
 package me.leesh.restapi.events;
 
-import com.fasterxml.jackson.core.JsonParser;
 import me.leesh.restapi.accounts.Account;
 import me.leesh.restapi.accounts.AccountRepository;
 import me.leesh.restapi.accounts.AccountRole;
 import me.leesh.restapi.accounts.AccountService;
+import me.leesh.restapi.common.AppProperties;
 import me.leesh.restapi.common.BaseControllerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +42,9 @@ class EventControllerTest extends BaseControllerTest {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AppProperties appProperties;
 
     @BeforeEach
     public void setUp() {
@@ -153,11 +156,9 @@ class EventControllerTest extends BaseControllerTest {
 
     private String getAccessToken() throws Exception {
         // given
-        String username = "lsh";
-        String password = "lsh";
         Account user = Account.builder()
-                .email(username)
-                .password(password)
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
@@ -167,9 +168,9 @@ class EventControllerTest extends BaseControllerTest {
         this.accountService.saveAccount(user);
 
         ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
                 .param("grant_type", "password"));
 
         MockHttpServletResponse responseBody = perform.andReturn().getResponse();
