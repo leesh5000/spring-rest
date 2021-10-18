@@ -13,13 +13,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 //@WebMvcTest // Slice 테스트이므로, Web 용 Bean들만 등록해줌
+@SpringBootTest // 전체 Bean이 등록된 테스트
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration.class)
 @ActiveProfiles("test") // base properties + "test" properties
-@SpringBootTest // 전체 Bean이 등록된 테스트
 @Disabled
-public abstract class BaseControllerTest {
+public class BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;

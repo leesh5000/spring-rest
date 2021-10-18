@@ -1,24 +1,19 @@
 package me.leesh.restapi.configs;
 
-import me.leesh.restapi.accounts.Account;
-import me.leesh.restapi.accounts.AccountRole;
 import me.leesh.restapi.accounts.AccountService;
 import me.leesh.restapi.common.AppProperties;
-import me.leesh.restapi.common.BaseControllerTest;
+import me.leesh.restapi.common.BaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AuthServerConfigTest extends BaseControllerTest {
+class AuthServerConfigTest extends BaseTest {
 
     @Autowired
     AccountService accountService;
@@ -36,15 +31,6 @@ class AuthServerConfigTest extends BaseControllerTest {
     @DisplayName("인증 토큰을 발급받는 테스트")
     public void getAuthToken() throws Exception {
 
-        // given
-//        Account user = Account.builder()
-//                .email(appProperties.getUserUsername())
-//                .password(appProperties.getUserPassword())
-//                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-//                .build();
-//
-//        String clientId = "myApp";
-//        String clientSecret = "pass";
 
         this.mockMvc.perform(post("/oauth/token")
                         .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
@@ -54,11 +40,7 @@ class AuthServerConfigTest extends BaseControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("access_token").exists())
-
-
         ;
-
-
     }
 
 
