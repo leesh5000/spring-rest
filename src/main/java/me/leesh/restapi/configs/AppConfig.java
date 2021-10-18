@@ -47,14 +47,14 @@ public class AppConfig {
                         .password(appProperties.getUserPassword())
                         .roles(Set.of(AccountRole.USER))
                         .build();
+                accountService.saveAccount(user);
 
                 Account admin = Account.builder()
                         .email(appProperties.getAdminUsername())
                         .password(appProperties.getAdminPassword())
                         .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                         .build();
-
-                accountService.saveAccount(user);
+                accountService.saveAccount(admin);
             }
         };
     }
