@@ -1,7 +1,9 @@
 package me.leesh.restapi.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import me.leesh.restapi.accounts.Account;
+import me.leesh.restapi.accounts.AccountSerializer;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -33,6 +35,7 @@ public class Event extends RepresentationModel<Event> {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
     @ManyToOne
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {

@@ -34,7 +34,8 @@ public class AccountService implements UserDetailsService {
                 () -> new UsernameNotFoundException(username));
         // 이 account를 스프링 시큐리티가 이해할 수 있는 UserDetails로 바꿔야한다.
 
-        return new User(account.getEmail(), account.getPassword(), authorities(account.getRoles()));
+//        return new User(account.getEmail(), account.getPassword(), authorities(account.getRoles()));
+        return new AccountAdapter(account);
     }
 
     // role -> grantedAuthority로 변경

@@ -1,5 +1,8 @@
 package me.leesh.restapi.events;
 
+import me.leesh.restapi.accounts.Account;
+import me.leesh.restapi.accounts.AccountAdapter;
+import me.leesh.restapi.accounts.CurrentUser;
 import me.leesh.restapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -7,7 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +43,10 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors,
+                                      @CurrentUser Account currentUser) {
+
+
 
         // JSR303으로 바인딩 시 에러 확인
         if (errors.hasErrors()) {
@@ -49,6 +61,7 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.update(); // service
+        event.setManager(currentUser);
         Event newEvent = this.eventRepository.save(event);
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI uri = selfLinkBuilder.toUri();
@@ -68,17 +81,27 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler,
+                                      // 필드에 있는 account를 주입해준다.
+                                      @CurrentUser Account account) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Object principal = authentication.getPrincipal(); // 여기서 principal은 UserDetails이다. (스프링 시큐리티의 유저)
 
         Page<Event> page = this.eventRepository.findAll(pageable);
         var pagedResources = assembler.toModel(page, EventResource::modelOf);
         pagedResources.add(Link.of("/docs/index.html#resources-events-list").withRel("profile"));
-        return ResponseEntity.ok(pagedResources);
 
+        // DB 조회하지 않고도, 현재 사용자의 정보를 꺼낼 수 있음
+        if (account != null) {
+            pagedResources.add(linkTo(EventController.class).withRel("create-event"));
+        }
+
+        return ResponseEntity.ok(pagedResources);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getEvent(@PathVariable Integer id) {
+    public ResponseEntity getEvent(@PathVariable Integer id,
+                                   @CurrentUser Account currentUser) {
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
 
 //        if (optionalEvent.isEmpty()) {
@@ -106,6 +129,9 @@ public class EventController {
                 .map(event -> {
                     EntityModel<Event> eventResource = EventResource.modelOf(event);
                     eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+                    if (event.getManager().equals(currentUser)) {
+                        eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+                    }
                     return ResponseEntity.ok(eventResource);
                 })
                 .orElseGet(() -> {
@@ -116,7 +142,8 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity updateEvent(@PathVariable Integer id,
                                       @RequestBody @Valid EventDto eventDto,
-                                      Errors errors) {
+                                      Errors errors,
+                                      @CurrentUser Account currentUser) {
 
         Optional<Event> optionalEvent = this.eventRepository.findById(id);
         if (optionalEvent.isEmpty()) {
@@ -133,6 +160,11 @@ public class EventController {
         }
 
         Event event = optionalEvent.get();
+
+        if (!event.getManager().equals(currentUser)) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
         this.modelMapper.map(eventDto, event);
         // service가 없기 때문에 임시로 save
         Event updateEvent = this.eventRepository.save(event);
